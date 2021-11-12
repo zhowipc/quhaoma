@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>号码随机抽取</title>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        /*1 5 2 6 26 15 47 19 62 32 45 17 4 25 11 13*/
+        .row_box {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+
+        }
+
+        .box {
+            margin-bottom: 20px;
+            margin-right: 10px;
+            box-shadow: 2px 2px black;
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ea5d5d;
+        }
+
+        .box_container {
+            font-size: 50px;
+            color: white;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div>
+        <div>
+            <!--             cols="120" rows="20"-->
+            <textarea name="input_area" id="data"
+                      style="border: #cec999 2px solid; width: 90%;height: 180px; margin: auto">
+</textarea>
+        </div>
+
+        <div>
+            <div style="display: flex;">
+                <div>
+                    <button style="width: 200px;height: 60px; background-color: #87d5d5">生成</button>
+                </div>
+                <div style="margin-left: 20px;">
+
+                    <select name="select" id="select" style="width: 200px; height: 60px">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div id="shownumber">
+
+    </div>
+    <div id="show_res" style="margin-top: 20px">
+        <!--        <div class="row_box">-->
+        <!--            <div class="box">-->
+        <!--                <div class="box_container">14</div>-->
+        <!--            </div>-->
+        <!---->
+        <!---->
+        <!--        </div>-->
+
+    </div>
+
+
+</div>
+</body>
+</html>
+<script>
+
+
+    $("#select").val(8)
+    let b = new Array(100).fill(0);
+    let data = [];
+    let ground = 3;
+    let cnt = 0;
+    var ans = new Array(10).fill(0)
+    $("button").click(function () {
+        data = []
+        let s = $("textarea").val();
+        ground = (Number)($("#select").val())
+        let reg = /^[0-9\s]+$/
+        if (!reg.test(s)) {
+            alert("输入错误，请检查输入");
+            return;
+        }
+        let ssplit = s.split(' ');
+        for (let i = 0; i < ssplit.length; i++) {
+            if (ssplit[i] !== '')
+                data.push(Number(ssplit[i]));
+        }
+        data.sort((a, b) => a - b);
+        let tem = new Array(100).fill(0);
+        for (let i = 0; i < data.length; i++) {
+            if (data[i] > 80) {
+                tem.fill(0)
+                alert('输入大于80，请检查后输入')
+                return;
+            }
+            if (tem[data[i]]) {
+                tem.fill(0)
+                alert('输入存在重复数字' + data[i] + "请检查后输入");
+                return;
+            }
+            tem[data[i]] = 1;
+        }
+        $("#show_res").empty()
+        dfs(0, 0);
+        console.log('总共：', cnt, '个')
+        $("#shownumber").text('总共：' + cnt + '个')
+    });
+
+    function dfs(u, step) {
+        if (step === ground) {
+            var tem = []
+            for (let i = 0; i < ground; i++) {
+                tem.push(ans[i]);
+            }
+            tem.sort(function () {
+                return Math.random() > 0.5 ? -1 : 1;
+            });
+            cnt += 1;
+            let line = " <div class=\"row_box\">"
+            for (let i = 0; i < ground; i++) {
+                line += "<div class=\"box\">\n" +
+                    "            <div class=\"box_container\">" + tem[i] + "</div>\n" +
+                    "        </div>"
+            }
+            line += "</div>"
+            $("#show_res").append(line);
+        }
+        for (let i = u; i < data.length; i++) {
+            if (step && ans[step - 1] > data[i]) {
+                continue;
+            }
+            if (b[data[i]])
+                continue;
+            b[data[i]] = 1;
+            ans[step] = data[i];
+            dfs(u + 1, step + 1);
+            b[data[i]] = 0;
+        }
+    }
+
+
+</script>
